@@ -1,0 +1,33 @@
+# Data
+data/
+*.csv
+*.parquet
+*.pkl
+*.h5
+*.joblib
+*.onnx
+
+# Environment
+.env
+.venv/
+env/
+venv/
+__pycache__/
+*.pyc
+
+# Notebooks
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Models
+models/*
+!models/.gitkeep
+
+# Temporary files
+tmp.md 
+ajustes.md
+flujo.md
+
