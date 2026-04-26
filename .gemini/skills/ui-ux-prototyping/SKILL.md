@@ -1,41 +1,40 @@
 ---
 name: ui-ux-prototyping
-description: Protocolo para la creación de interfaces premium no funcionales y validación de flujos de usuario (Mockups).
+description: Protocolo para la creación de interfaces premium no funcionales y validación de flujos de usuario (Mockups) con enfoque en Diseño de Autor.
 user-invocable: false
 agent: ai-ux-designer
 allowed-tools: [generate_image, Read, Write, Edit, Bash]
 ---
 
-# Skill: Prototipado UI/UX
+# Skill: Prototipado UI/UX (Author Edition)
 
-Esta habilidad permite al equipo validar la "cara" del proyecto antes de construir el "cerebro" (IA) utilizando técnicas de prototipado rápido.
+Esta habilidad permite al equipo validar la "cara" del proyecto antes de construir el "cerebro" (IA) utilizando técnicas de prototipado rápido y estética de alto impacto (Anti-AI Slop).
 
 ## Funciones
 
-### 1. Concepción de Interfaz (Visual Concept)
-**Acción:** `generate_visual_concept`
-- Utiliza la herramienta `generate_image` para crear conceptos estéticos rápidamente. No es necesario que sean finales, solo deben transmitir la "vibra" del producto.
+### 1. Dirección de Arte y Concepto (Art Direction)
+**Acción:** `define_art_direction`
+- Antes de prototipar, el agente debe definir una "Dirección de Arte" (ej: *Lujo Clínico, Brutalismo Técnico, Minimalismo Radical*).
+- **Rechazo al "AI Slop":** Evitar layouts genéricos (sidebar izquierda + navbar arriba sin personalidad). Buscar asimetría y composiciones editoriales.
+- Utiliza `generate_image` para crear conceptos visuales si la dirección es ambigua.
 
-### 2. Construcción de Prototipo "Smoke and Mirrors"
-**Acción:** `build_rapid_prototype`
-- Crea archivos HTML/CSS ultra-ligeros.
-- **Regla del Dato Quemado:** Todos los gráficos, tablas y textos deben ser estáticos (Hardcoded). Prohibido intentar conectar con archivos JSON o CSV externos para ahorrar tiempo.
-- Usa placeholders de alta calidad si es necesario.
+### 2. Construcción de Prototipo "Physical & Motion"
+**Acción:** `build_author_prototype`
+- Crea archivos HTML/CSS que se sientan "físicos" y vivos.
+- **Texturizado:** Implementar sutiles ruidos de grano (`noise texture`) y gradientes de malla para romper la planitud digital.
+- **Orquestación de Movimiento:** Usar animaciones CSS escalonadas (`staggered`) para que los elementos entren con ritmo, no todos a la vez.
+- **Regla del Dato Quemado:** Datos estáticos (hardcoded) para máxima velocidad de iteración.
 
 ### 3. Mapeo de UI a Requerimientos
 **Acción:** `map_ui_to_backlog`
-- Identifica qué elementos visuales aprobados requieren lógica compleja en las fases siguientes y notifica al **Backlog Manager**.
+- Traduce los componentes visuales aprobados en requerimientos técnicos para el **ai-frontend-engineer**.
 
 ## Reglas Técnicas
-- **Design System First:** Antes de generar cualquier HTML, verificar si existe `docs/design-system/`:
-  - **Existe:** Leer `DESIGN.md` y extraer el bloque `tailwind.config` de `code.html`. Aplicar como restricciones absolutas.
-  - **No existe:** Preguntar al usuario — *"¿Deseas definir colores y fuente corporativa antes de prototipar? (color primario, fondo, texto, fuente). Si no, aplico estética premium por defecto."* Crear `docs/design-system/DESIGN.md` si el usuario responde, o continuar con defaults si omite.
-- **Tokens son Ley:** Los colores, tipografías y border-radius del `code.html` son restricciones absolutas. No sustituir por valores propios.
-- **Referencia Visual:** Si existe `docs/design-system/screen.png`, usarla como criterio de aceptación visual.
-- **Velocidad sobre Perfección:** Un mockup al 80% visualmente atractivo hoy es mejor que uno al 100% perfecto la próxima semana.
-- **Interactividad Simulada:** Usa animaciones CSS simples para dar sensación de vida sin escribir JavaScript pesado.
-- **Aislamiento:** El código del Mockup reside solo en `mockup/` (raíz del proyecto).
-
+- **Design System as Foundation:** El `docs/design-system/` es el suelo, no el techo. Úsalo como base técnica (tokens), pero aplica la "Capa de Autor" encima.
+- **Tipografía con Intención:** No usar fuentes estándar si el Design System no lo exige. Priorizar legibilidad con carácter.
+- **Profundidad Real:** Evitar sombras de caja (`box-shadow`) genéricas. Usar capas tonales o sombras ambientales con gran difuminado (blur) y baja opacidad.
+- **Velocidad sobre Perfección:** Un mockup al 80% visualmente excepcional es mejor que uno al 100% genérico.
+- **Aislamiento:** El código del Mockup reside solo en `mockup/`.
 
 ---
 
