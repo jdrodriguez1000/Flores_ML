@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Flores_ML - Sistema de Clasificación Iris</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#00478d",
+                        "primary-container": "#005eb8",
+                        "surface": "#f8f9ff",
+                        "on-surface": "#181c22",
+                        "on-surface-variant": "#424752",
+                        "surface-container-low": "#f1f3fc",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#793100",
+                        "tertiary-container": "#9f4300",
+                    },
+                    "borderRadius": { "2xl": "1rem", "3xl": "1.5rem" }
+                },
+            },
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view-content').forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('animate-fade-up');
+            });
+            const target = document.getElementById(viewId);
+            target.classList.remove('hidden');
+            target.classList.add('animate-fade-up');
+            
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('bg-primary', 'text-white', 'shadow-lg');
+                l.classList.add('text-on-surface-variant');
+            });
+            if(event) event.currentTarget.classList.add('bg-primary', 'text-white', 'shadow-lg');
+        }
+
+        function runAnalysis() {
+            const btn = document.getElementById('main-action-btn');
+            const resultBox = document.getElementById('analysis-result');
+            const emptyBox = document.getElementById('analysis-empty');
+            
+            btn.innerHTML = '<span class="animate-spin material-symbols-outlined">refresh</span> PROCESANDO...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                emptyBox.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                resultBox.classList.add('animate-fade-up');
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> CLASIFICACIÓN COMPLETADA';
+                btn.classList.replace('bg-primary', 'bg-green-600');
+            }, 800);
+        }
+
+        function confirmSave() {
+            showToast("Registro guardado con éxito en el sistema.");
+            resetAnalysis();
+        }
+
+        function editManually() {
+            document.getElementById('view-mode').classList.add('hidden');
+            document.getElementById('edit-mode').classList.remove('hidden');
+        }
+
+        function saveCorrection() {
+            const selected = document.getElementById('species-selector').value;
+            showToast("Corrección registrada: " + selected);
+            resetAnalysis();
+        }
+
+        function cancelCorrection() {
+            document.getElementById('view-mode').classList.remove('hidden');
+            document.getElementById('edit-mode').classList.add('hidden');
+        }
+
+        function resetAnalysis() {
+            document.getElementById('analysis-result').classList.add('hidden');
+            document.getElementById('analysis-empty').classList.remove('hidden');
+            document.getElementById('view-mode').classList.remove('hidden');
+            document.getElementById('edit-mode').classList.add('hidden');
+            
+            const btn = document.getElementById('main-action-btn');
+            btn.innerHTML = '<span class="material-symbols-outlined">analytics</span> CLASIFICAR MUESTRA';
+            btn.classList.replace('bg-green-600', 'bg-primary');
+            btn.disabled = false;
+            document.querySelectorAll('#analysis-form input').forEach(i => i.value = '');
+        }
+
+        function toggleRowDetail(id) {
+            const detail = document.getElementById('detail-' + id);
+            detail.classList.toggle('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.remove('hidden', 'translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 500);
+            }, 3000);
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, .headline { font-family: 'Manrope', sans-serif; }
+        .noise::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.04; pointer-events: none; z-index: 9999;
+        }
+        .sidebar-blur { backdrop-filter: blur(20px); background: rgba(248, 249, 255, 0.9); }
+        .animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .ambient-shadow { box-shadow: 0 20px 40px -12px rgba(24, 28, 34, 0.08); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex noise overflow-hidden">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 bg-on-surface text-white px-8 py-4 rounded-2xl shadow-2xl z-[10000] transition-all duration-500 font-bold text-sm">
+        Mensaje del sistema
+    </div>
+
+    <!-- Navegación Lateral -->
+    <aside class="w-72 sidebar-blur h-screen sticky top-0 border-r border-outline-variant/10 p-8 flex flex-col gap-10">
+        <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-xl">
+                <span class="material-symbols-outlined text-white text-2xl">eco</span>
+            </div>
+            <div>
+                <div class="text-xl font-extrabold tracking-tighter text-primary leading-none">Iris<span class="text-on-surface-variant font-light">Labs</span></div>
+                <p class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mt-1">Control de Calidad</p>
+            </div>
+        </div>
+
+        <nav class="flex flex-col gap-3">
+            <button onclick="showView('view-analysis')" class="nav-link flex items-center gap-4 p-4 rounded-2xl bg-primary text-white shadow-lg transition-all font-bold text-sm text-left">
+                <span class="material-symbols-outlined">biotech</span> NUEVA MUESTRA
+            </button>
+            <button onclick="showView('view-history')" class="nav-link flex items-center gap-4 p-4 rounded-2xl text-on-surface-variant hover:bg-surface-container-high transition-all font-bold text-sm text-left">
+                <span class="material-symbols-outlined">inventory</span> REGISTRO DE DÍA
+            </button>
+            <button onclick="showView('view-audit')" class="nav-link flex items-center gap-4 p-4 rounded-2xl text-on-surface-variant hover:bg-surface-container-high transition-all font-bold text-sm text-left">
+                <span class="material-symbols-outlined">verified_user</span> REVISIÓN EXPERTA
+            </button>
+        </nav>
+
+        <div class="mt-auto pt-8 border-t border-outline-variant/20">
+            <div class="flex items-center gap-4 p-3 bg-white rounded-2xl border border-blue-50">
+                <img src="https://ui-avatars.com/api/?name=Robert+Fisher&background=00478d&color=fff" class="w-10 h-10 rounded-xl" alt="User">
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold truncate">Dr. Robert Fisher</p>
+                    <p class="text-[10px] text-primary font-bold uppercase tracking-widest leading-none">Analista Principal</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Espacio de Trabajo -->
+    <main class="flex-grow p-12 lg:p-16 overflow-y-auto">
+
+        <!-- VISTA: NUEVA MUESTRA -->
+        <div id="view-analysis" class="view-content animate-fade-up">
+            <header class="mb-12">
+                <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Clasificar Nueva Muestra</h1>
+                <p class="text-on-surface-variant text-sm max-w-lg">Ingrese las medidas físicas de la flor para obtener una clasificación inmediata.</p>
+            </header>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                <section class="xl:col-span-7 bg-white rounded-3xl p-10 shadow-sm border border-blue-50 ambient-shadow">
+                    <h2 class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-10">Medidas de la Flor (cm)</h2>
+                    <div id="analysis-form" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Largo del Sépalo</label>
+                            <input type="number" step="0.1" placeholder="Ej: 5.1" class="bg-surface-container-low border-none rounded-xl p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Ancho del Sépalo</label>
+                            <input type="number" step="0.1" placeholder="Ej: 3.5" class="bg-surface-container-low border-none rounded-xl p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Largo del Pétalo</label>
+                            <input type="number" step="0.1" placeholder="Ej: 1.4" class="bg-surface-container-low border-none rounded-xl p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Ancho del Pétalo</label>
+                            <input type="number" step="0.1" placeholder="Ej: 0.2" class="bg-surface-container-low border-none rounded-xl p-4 text-sm font-bold focus:ring-2 focus:ring-primary/20">
+                        </div>
+                    </div>
+                    <button id="main-action-btn" onclick="runAnalysis()" class="w-full py-5 bg-primary text-white text-xs font-bold rounded-xl tracking-widest uppercase hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
+                        <span class="material-symbols-outlined">analytics</span> CLASIFICAR MUESTRA
+                    </button>
+                </section>
+
+                <aside class="xl:col-span-5">
+                    <div id="analysis-empty" class="h-full border-2 border-dashed border-blue-100 rounded-3xl flex flex-col items-center justify-center p-12 text-center opacity-50">
+                        <span class="material-symbols-outlined text-6xl text-blue-200 mb-4">query_stats</span>
+                        <p class="text-sm font-medium text-on-surface-variant">Complete los datos y presione "Clasificar Muestra" para ver el resultado.</p>
+                    </div>
+
+                    <div id="analysis-result" class="hidden h-full bg-blue-50 rounded-3xl p-8">
+                        <div id="view-mode" class="flex flex-col h-full">
+                            <div class="flex items-center gap-2 mb-8">
+                                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                <span class="text-[10px] font-bold text-green-700 uppercase tracking-widest">Resultado Exitoso</span>
+                            </div>
+                            <div class="text-center mb-10 flex-grow flex flex-col justify-center">
+                                <p class="text-xs font-semibold text-on-surface-variant mb-2">Especie Detectada</p>
+                                <h3 class="text-5xl font-black text-primary mb-4 tracking-tighter">Iris Setosa</h3>
+                                <div class="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-blue-100 mx-auto">
+                                    <span class="material-symbols-outlined text-green-600 text-sm">verified</span>
+                                    <span class="text-xs font-bold text-primary">99.8% de Seguridad</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <button onclick="confirmSave()" class="w-full py-4 bg-primary text-white text-xs font-bold rounded-xl tracking-widest uppercase hover:opacity-90 transition-all">CONFIRMAR Y GUARDAR</button>
+                                <button onclick="editManually()" class="w-full py-4 bg-white text-on-surface-variant text-xs font-bold rounded-xl tracking-widest uppercase border border-blue-100 hover:bg-surface transition-all">CORREGIR MANUALMENTE</button>
+                            </div>
+                        </div>
+
+                        <div id="edit-mode" class="hidden flex flex-col h-full">
+                            <div class="flex items-center gap-2 mb-8">
+                                <span class="w-3 h-3 rounded-full bg-tertiary"></span>
+                                <span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Corrección del Experto</span>
+                            </div>
+                            <div class="text-center mb-10 flex-grow flex flex-col justify-center gap-6">
+                                <p class="text-xs font-semibold text-on-surface-variant">Seleccione la especie correcta:</p>
+                                <select id="species-selector" class="w-full bg-white border-2 border-blue-100 rounded-2xl p-4 text-lg font-black text-primary text-center appearance-none cursor-pointer">
+                                    <option value="Iris Setosa">Iris Setosa</option>
+                                    <option value="Iris Versicolor">Iris Versicolor</option>
+                                    <option value="Iris Virginica">Iris Virginica</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <button onclick="saveCorrection()" class="w-full py-4 bg-tertiary text-white text-xs font-bold rounded-xl tracking-widest uppercase hover:opacity-90 transition-all">GUARDAR CAMBIO</button>
+                                <button onclick="cancelCorrection()" class="w-full py-4 bg-transparent text-on-surface-variant text-xs font-bold rounded-xl tracking-widest uppercase hover:underline transition-all">CANCELAR</button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <!-- VISTA: REGISTRO DE DÍA (Historial con Detalle) -->
+        <div id="view-history" class="view-content hidden animate-fade-up">
+            <header class="mb-12">
+                <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Registro de Hoy</h1>
+                <p class="text-on-surface-variant text-sm">Resumen de clasificaciones realizadas con desglose de medidas físicas.</p>
+            </header>
+            <section class="bg-white rounded-3xl overflow-hidden border border-blue-50 shadow-sm ambient-shadow">
+                <table class="w-full text-left">
+                    <thead class="bg-blue-50">
+                        <tr>
+                            <th class="p-5 text-[10px] font-bold text-primary uppercase tracking-widest">ID</th>
+                            <th class="p-5 text-[10px] font-bold text-primary uppercase tracking-widest">Especie Detectada</th>
+                            <th class="p-5 text-[10px] font-bold text-primary uppercase tracking-widest text-center">Seguridad</th>
+                            <th class="p-5 text-[10px] font-bold text-primary uppercase tracking-widest text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-blue-50 hover:bg-blue-50/20 transition-colors">
+                            <td class="p-5 font-bold">#1024</td>
+                            <td class="p-5 font-bold text-primary text-lg italic">Iris Setosa</td>
+                            <td class="p-5 text-center font-black">99.8%</td>
+                            <td class="p-5 text-right">
+                                <button onclick="toggleRowDetail('1024')" class="text-[10px] font-black text-primary hover:underline uppercase flex items-center gap-1 ml-auto">
+                                    <span class="material-symbols-outlined text-sm">expand_more</span> VER DETALLES
+                                </button>
+                            </td>
+                        </tr>
+                        <tr id="detail-1024" class="hidden bg-blue-50/30">
+                            <td colspan="4" class="p-8">
+                                <div class="grid grid-cols-4 gap-6">
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Largo Sépalo</p><p class="text-sm font-black">5.1 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Ancho Sépalo</p><p class="text-sm font-black">3.5 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Largo Pétalo</p><p class="text-sm font-black">1.4 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Ancho Pétalo</p><p class="text-sm font-black">0.2 cm</p></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Caso 2 -->
+                        <tr class="border-b border-blue-50 hover:bg-blue-50/20 transition-colors">
+                            <td class="p-5 font-bold">#1023</td>
+                            <td class="p-5 font-bold text-primary text-lg italic">Iris Virginica</td>
+                            <td class="p-5 text-center font-black">98.2%</td>
+                            <td class="p-5 text-right">
+                                <button onclick="toggleRowDetail('1023')" class="text-[10px] font-black text-primary hover:underline uppercase flex items-center gap-1 ml-auto">
+                                    <span class="material-symbols-outlined text-sm">expand_more</span> VER DETALLES
+                                </button>
+                            </td>
+                        </tr>
+                        <tr id="detail-1023" class="hidden bg-blue-50/30">
+                            <td colspan="4" class="p-8">
+                                <div class="grid grid-cols-4 gap-6">
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Largo Sépalo</p><p class="text-sm font-black">6.3 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Ancho Sépalo</p><p class="text-sm font-black">3.3 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Largo Pétalo</p><p class="text-sm font-black">6.0 cm</p></div>
+                                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100/50"><p class="text-[8px] font-bold uppercase mb-1">Ancho Pétalo</p><p class="text-sm font-black">2.5 cm</p></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <!-- VISTA: REVISIÓN EXPERTA (Auditoría con 3 casos) -->
+        <div id="view-audit" class="view-content hidden animate-fade-up">
+            <header class="mb-12 flex justify-between items-end">
+                <div>
+                    <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Revisión de Casos Pendientes</h1>
+                    <p class="text-on-surface-variant text-sm">Validación humana necesaria por baja seguridad o control de calidad aleatorio.</p>
+                </div>
+                <div class="bg-tertiary text-white px-5 py-2 rounded-xl text-xs font-bold">3 PENDIENTES</div>
+            </header>
+
+            <div class="flex flex-col gap-8 max-w-5xl">
+                <!-- Caso 1: Baja Seguridad -->
+                <div class="bg-white rounded-3xl p-8 border-l-8 border-tertiary shadow-sm flex flex-col lg:flex-row gap-8 ambient-shadow">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="px-3 py-1 bg-tertiary text-white text-[9px] font-bold rounded-full">SEGURIDAD BAJA</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Muestra #1022 · 14:20 PM</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-[8px] font-bold uppercase mb-1">Largo Sépalo</p><p class="text-sm font-bold text-primary">6.0 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-[8px] font-bold uppercase mb-1">Ancho Sépalo</p><p class="text-sm font-bold text-primary">2.5 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-[8px] font-bold uppercase mb-1">Largo Pétalo</p><p class="text-sm font-bold text-primary">4.8 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-[8px] font-bold uppercase mb-1">Ancho Pétalo</p><p class="text-sm font-bold text-primary">1.6 cm</p></div>
+                        </div>
+                    </div>
+                    <div class="lg:w-72 lg:border-l border-blue-50 lg:pl-10 flex flex-col justify-center gap-6">
+                        <div class="text-center lg:text-left">
+                            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Sugerencia Sistema</p>
+                            <p class="text-xl font-black text-tertiary italic">Iris Versicolor <span class="text-xs font-normal opacity-50">(78%)</span></p>
+                        </div>
+                        <button onclick="showToast('Sugerencia validada exitosamente.')" class="w-full py-3 bg-primary text-white text-[10px] font-bold rounded-xl uppercase tracking-widest shadow-lg shadow-primary/20">VALIDAR SUGERENCIA</button>
+                    </div>
+                </div>
+
+                <!-- Caso 2: Control Aleatorio -->
+                <div class="bg-white rounded-3xl p-8 border-l-8 border-blue-600 shadow-sm flex flex-col lg:flex-row gap-8 ambient-shadow">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="px-3 py-1 bg-blue-600 text-white text-[9px] font-bold rounded-full uppercase">Calidad 5%</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Muestra #1025 · 15:05 PM</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">5.1 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">3.5 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">1.4 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">0.2 cm</p></div>
+                        </div>
+                    </div>
+                    <div class="lg:w-72 lg:border-l border-blue-50 lg:pl-10 flex flex-col justify-center gap-4 text-center">
+                        <p class="text-[10px] italic text-on-surface-variant">Protocolo de revisión ciega activado.</p>
+                        <button onclick="showToast('Abriendo panel de identificación ciega...')" class="w-full py-3 bg-blue-50 text-blue-800 text-[10px] font-bold rounded-xl uppercase tracking-widest border border-blue-100">IDENTIFICAR ESPECIE</button>
+                    </div>
+                </div>
+
+                <!-- Caso 3: Especie Crítica (Virginica) -->
+                <div class="bg-white rounded-3xl p-8 border-l-8 border-primary shadow-sm flex flex-col lg:flex-row gap-8 ambient-shadow">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="px-3 py-1 bg-primary text-white text-[9px] font-bold rounded-full uppercase">Valor Alto</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Muestra #1026 · 15:45 PM</span>
+                        </div>
+                        <p class="text-xs text-on-surface-variant mb-6 italic">Posible Iris Virginica detectada. Requiere confirmación humana por impacto comercial.</p>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">6.1 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">3.0 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">5.2 cm</p></div>
+                            <div class="bg-surface-container-low p-4 rounded-xl text-center"><p class="text-sm font-bold text-primary">1.9 cm</p></div>
+                        </div>
+                    </div>
+                    <div class="lg:w-72 lg:border-l border-blue-50 lg:pl-10 flex flex-col justify-center gap-6">
+                        <div class="text-center lg:text-left">
+                            <p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Sugerencia Sistema</p>
+                            <p class="text-xl font-black text-primary italic">Iris Virginica <span class="text-xs font-normal opacity-50">(94%)</span></p>
+                        </div>
+                        <button onclick="showToast('Especie de alto valor confirmada.')" class="w-full py-3 bg-primary text-white text-[10px] font-bold rounded-xl uppercase tracking-widest shadow-lg shadow-primary/20">CONFIRMAR ESPECIE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
