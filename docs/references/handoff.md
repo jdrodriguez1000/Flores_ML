@@ -1,25 +1,26 @@
 # Handoff Operativo - Flores_ML
 
-**Fecha:** 26 de abril de 2026
-**Estado de la Sesión:** Slice 1 (Ingeniería de Datos) Certificado al 100%.
+**Fecha:** 27 de abril de 2026
+**Estado de la Sesión:** Infraestructura de Tracking Certificada. Inicio de Slice 2.
 
 ## ✅ Logros
-1. **Certificación de Limpieza Silver (T-2.1.1.B.GRN):** Implementación de `DataProcessor` con **Leakage Shield** y normalización.
-2. **Detección de Deriva (T-2.1.1.DRIFT.GRN):** Lógica de Z-score integrada y validada con tests.
-3. **Validación de Contrato Rígido (T-2.1.1.VAL.GRN):**
-   - Integración de **Pydantic** para validación de entrada en tiempo de ejecución.
-   - Implementación de reglas de **Biological Range** (0.1-15.0 cm) y **Logic Consistency** (width < length).
-   - Política estricta de "No Extra Fields" y "No Coercion" (Strict Typing).
-   - Suite de pruebas `tests/test_data_contract.py` en `GREEN`.
-4. **Higiene Técnica:** Excepciones de dominio (`ERR_01` a `ERR_07`) vinculadas al Contrato de Datos.
+1. **Infraestructura de Tracking (T-2.1.2.MLO.GRN):**
+   - Servidor **MLflow** configurado y operativo en `http://localhost:5001`.
+   - Persistencia configurada en SQLite (`sqlite:///mlruns.db`) para trazabilidad de experimentos.
+   - Test de conexión `tests/test_tracking_connection.py` en `GREEN`.
+2. **Higiene del Entorno:**
+   - Creación de entorno virtual `.venv` para aislamiento de dependencias.
+   - Estandarización de `requirements.txt` con la inclusión de `mlflow`.
+3. **Validación Total:** Ejecución exitosa de la suite completa de tests (13 passed).
 
 ## ⏳ Pendientes
-- **T-2.1.2.MLO.RED:** Test de Conexión a Servidor Tracking (MLflow/W&B).
-- **T-2.1.2.RED:** Test de Interfaz de Predicción.
+- **T-2.1.2.RED:** Test de Interfaz de Predicción (SpecDD).
+- **T-2.1.2.EVAL.RED:** Test de Umbral de Aceptación de Negocio (BRD).
+- **T-2.1.2.GRN:** Entrenamiento de Baseline con Tracking.
 
 ## 🚫 Bloqueadores
-- Ninguno. El Slice 1 está cerrado y certificado.
+- Ninguno.
 
 ## 🚀 Próximos Pasos
-1. **Inicio de Slice 2 (Modelado):** Configurar el entorno de tracking de experimentos y definir la interfaz de predicción según el SpecDD.
-2. **Entrenamiento de Baseline:** Una vez configurado el tracking, proceder con el entrenamiento del modelo base.
+1. Definir la interfaz de predicción en el motor de inferencia siguiendo el SpecDD.
+2. Implementar los tests de evaluación de negocio para el modelo baseline.

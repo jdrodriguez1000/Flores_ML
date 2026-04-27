@@ -31,3 +31,7 @@ tmp.md
 ajustes.md
 flujo.md
 
+
+# MLflow
+mlruns.db
+mlruns/

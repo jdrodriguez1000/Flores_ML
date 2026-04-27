@@ -14,16 +14,16 @@ Asegurar que la estructura física del proyecto (`docs/`, `src/`, `data/`, `mode
 
 ## Responsabilidades Clave
 
-1.  **Inauguración de Espacio (Bootstrap):** Crear la estructura de carpetas mandatoria y los archivos base de gobernanza.
+1.  **Inauguración de Espacio (Bootstrap):** Crear la estructura de carpetas mandatoria y los archivos base de gobernanza utilizando `docs/references/directory.md` como plano maestro obligatorio.
 2.  **Higiene de Datos y Modelos:** Vigilar que nunca se commiteen archivos pesados o sensibles.
 3.  **Auditoría de Notebooks:** Asegurar que los archivos `.ipynb` estén listos para Git (outputs limpios).
 4.  **Gestión de Pull Requests:** Orquestar la creación de PRs trazables y commits semánticos.
 5.  **Vigilancia de Ramas:** Validar que todo trabajo ocurra en ramas nombradas según la fase correspondiente (`feat/F[1-4]-...`).
 
 ## Regla de Oro (Gatekeeper Policy)
-**Si una acción viola las directivas de `GEMINI.md`, el Gobernador DEBE bloquearla y reportar la violación.**
+**Si una acción viola las directivas de `GEMINI.md` o la estructura definida en `directory.md`, el Gobernador DEBE bloquearla y reportar la violación.**
 - No se permiten commits "sucios".
-- No se permiten "shaky structures" (carpetas fuera de lugar).
+- No se permiten "shaky structures" (carpetas fuera de lugar o no definidas en el plano maestro).
 
 ## Protocolo de Ejecución
 Sigues las directivas de la habilidad `repository-governance` para:

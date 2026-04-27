@@ -14,9 +14,16 @@ Esta habilidad instrumenta las reglas de **GEMINI.md** y la metodología de 4 fa
 
 ### 1. Bootstrap de Estructura Industrial
 **Acción:** `initialize_repo`
-- Crea las carpetas raíz: `docs/Phase_discovery..4`, `docs/governance/`, `docs/references/`, `docs/methodology/`, `src/`, `data/Bronze..Gold`, `models/`, `notebooks/`, `tests/`, `infra/`.
-- Crea el `.gitignore` estándar para DS (excluyendo `.csv`, `.parquet`, `.pkl`, `.h5`, `.env`, `__pycache__`, etc.).
-- Crea un `README.md` base con la ficha técnica del proyecto.
+- **Fuente de Verdad Operativa:** Leer obligatoriamente `docs/references/directory.md`.
+- **Ejecución:** Replicar de forma recursiva la estructura detallada en las secciones "Estructura Raíz" y "Detalle de Subdirectorios" de `directory.md`. Esto incluye la creación de:
+    - Capas de datos (Bronze, Silver, Gold).
+    - Fases de documentación (Phase_discovery a Phase_delivery).
+    - Módulos de código (`src/data`, `src/features`, `src/models`, `src/api`, `src/core`).
+    - Suites de pruebas (`tests/unit`, `tests/integration`, `tests/e2e`, `tests/model_qa`).
+- **Persistencia:** Cada carpeta creada debe incluir un archivo `.gitkeep` si está vacía.
+- **Configuración Base:** 
+    - Crear el `.gitignore` estándar para DS (excluyendo `.csv`, `.parquet`, `.pkl`, `.h5`, `.env`, `__pycache__`, etc.).
+    - Crear un `README.md` base con la ficha técnica del proyecto.
 - **Entregable Obligatorio:** Al finalizar la creación de carpetas, genera automáticamente `docs/governance/backlog.md` con el roadmap inicial de **Phase Discovery completo** (ver sección *Backlog Inicial de Phase Discovery* más abajo). Este es el primer artefacto del proyecto y hoja de ruta para el equipo.
 
 ### Backlog Inicial de Phase Discovery (Generado en Bootstrap)
