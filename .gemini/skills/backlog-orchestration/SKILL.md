@@ -15,11 +15,14 @@ Esta habilidad permite transformar el plan maestro en acciones ejecutables, aseg
 ### 1. Inicialización de Roadmap (Slices Verticales)
 **Acción:** `initialize_roadmap`
 - Crea el archivo `docs/governance/backlog.md`.
-- Estructura el Backlog usando un enfoque iterativo de **Slices Verticales (Balas Trazadoras)** en lugar de cascada:
-    - **Iteración 0 (Discovery):** Generación de la línea base documental (BRD, SAD, SpecDD, BDD).
-    - **Iteración 1 (Tracer Bullet):** Selección de **UN solo** escenario BDD o variable clave. Ejecución transversal (Data Engineering -> Modeling -> UI Delivery) para esta única variable hasta validarla E2E.
-    - **Iteraciones 2..N (Expansión):** Adición iterativa de nuevos escenarios BDD, completando el ciclo RED/GREEN transversal por cada uno.
-- **Prohibición de Cascada:** El Backlog NUNCA debe estructurarse exigiendo terminar el 100% de la capa de datos antes del modelo, ni el 100% del modelo antes del frontend.
+- Estructura el Backlog usando un enfoque iterativo de **Slices Verticales (Balas Trazadoras)**.
+- **Estructura Obligatoria de Iteración:**
+    *   **Título de Iteración**
+    *   **Estado:** [No iniciada | En progreso | Finalizada | Bloqueada]
+    *   **Objetivo:** Descripción técnica del hito.
+    *   **Criterio de Éxito de Usuario Final (UAT):** Descripción narrativa de lo que el usuario final verá, experimentará o podrá realizar al finalizar la iteración.
+    *   **Fuera de Alcance de la Iteración:** Lista explícita de funcionalidades o componentes que NO se entregarán ni se deben esperar en esta iteración específica para evitar el scope creep.
+- **Prohibición de Cascada:** El Backlog NUNCA debe estructurarse exigiendo terminar el 100% de la capa de datos antes del modelo.
 
 ### 2. Atomización de SpecDD (TDD Mapping)
 **Acción:** `atomize_specs_to_tasks`
@@ -29,11 +32,25 @@ Esta habilidad permite transformar el plan maestro en acciones ejecutables, aseg
     2.  **Tarea [GREEN]:** Implementación de la lógica productiva. El DoD es que el test asociado pase exitosamente a `GREEN`.
 - Asigna el agente responsable (ej: `ai-data-engineer` para la lógica y `ai-data-sdet` para el test).
 
-### 3. Gestión de Tareas (Task Management)
-**Acción:** `manage_task_state`
-- Actualiza el estado de las tareas (Block, In Progress, Done).
-- Verifica el **DoD (Definition of Done)** antes de marcar como finalizada.
-- Asegura que el responsable sea único por tarea.
+### 3. Gestión de Tareas e Iteraciones (Management Protocol)
+**Acción:** `manage_backlog_state`
+
+#### Estados de Tareas:
+- `No iniciada`
+- `En progreso`
+- `Completada`
+
+#### Estados de Iteraciones:
+- `No iniciada`
+- `En progreso`
+- `Finalizada`
+- `Bloqueada`
+
+#### Protocolo de Cierre de Iteración:
+1.  **Condición de Completitud:** Todas las tareas de la iteración deben estar en estado `Completada`.
+2.  **Validación Humana Obligatoria:** Una iteración solo pasa a `Finalizada` tras la confirmación explícita del humano de que es realmente funcional después de realizar sus propias pruebas como usuario final.
+3.  **Gestión de Fallos (Bloqueo):** Si todas las tareas están `Completada` pero las pruebas del humano fallan, la iteración debe marcarse como `Bloqueada`.
+4.  **Recuperación de Bloqueo:** Es obligatorio agregar nuevas tareas de tipo `Revision / Fallo Test` para resolver los problemas presentados. No se permite continuar con la siguiente iteración sin estas tareas.
 
 ## Estructura de Tarea en backlog.md
 ```markdown
@@ -41,10 +58,10 @@ Esta habilidad permite transformar el plan maestro en acciones ejecutables, aseg
 - **Responsable:** @agente-nombre
 - **Iteración:** X.Y
 - **Entregable:** Nombre del Archivo/Componente
-- **Acción:** [Coding | Testing | Documentation]
+- **Acción:** [Coding | Testing | Documentation | Revision / Fallo Test]
 - **BDD Target:** [ID del Escenario en behavior.md]
 - **DoD:** Tests E2E/Unitarios para el escenario target arrojan GREEN.
-- **Estado:** [TODO | IN_PROGRESS | DONE]
+- **Estado:** [No iniciada | En progreso | Completada]
 ```
 
 ## Reglas de Validación

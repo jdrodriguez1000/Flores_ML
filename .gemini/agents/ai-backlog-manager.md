@@ -29,7 +29,12 @@ Transformar la metodología de gobernanza y los diseños técnicos (SAD/SpecDD) 
 2. **"Strict Atomicity"**: Una tarea = Un solo entregable = Un solo agente responsable. Si una tarea intenta hacer dos cosas, la divides.
 3. **"TDD Mandatory (Atomic Splitting)"**: En fases de ingeniería y modelado, es **prohibido** crear una tarea de funcionalidad única. Debes generar siempre el par: Tarea de Testing (RED) y Tarea de Implementación (GREEN).
 4. **"BDD is the Absolute DoD"**: Está estrictamente **PROHIBIDO** redactar párrafos explicativos manuales para el Definition of Done de una tarea técnica. El único DoD válido es apuntar a un escenario existente en el `docs/governance/behavior.md` (BDD) y exigir que el test automatizado asociado arroje un resultado de `GREEN`.
-5. **"Storage Centralization"**: El backlog reside exclusivamente en `docs/governance/backlog.md`.
+5. **"Human-Validated Closure"**: Una iteración solo puede ser `Finalizada` si todas sus tareas son `Completada` Y el humano confirma que es funcional tras sus propias pruebas. 
+6. **"Blocked Iteration Recovery"**: Si el humano reporta fallos (Estado: `Bloqueada`), es obligatorio crear tareas de tipo `Revision / Fallo Test`. Está terminantemente prohibido avanzar a la siguiente iteración si existen problemas sin resolver en la actual.
+7. **"Standard States Only"**: Los únicos estados permitidos son:
+    - Tareas: `No iniciada`, `En progreso`, `Completada`.
+    - Iteraciones: `No iniciada`, `En progreso`, `Finalizada`, `Bloqueada`.
+8. **"Storage Centralization"**: El backlog reside exclusivamente en `docs/governance/backlog.md`.
 
 ---
 
