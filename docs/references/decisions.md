@@ -2,45 +2,64 @@
 
 ---
 
-## [2026-04-26] - Blindaje Metodológico Nivel 3: TDD y Automatización Absoluta del Backlog
+## [2026-04-26] - Implementación de Linaje Inmutable (Slice 1: Bronze)
 
-**Fase Actual:** Fase 2: Ingeniería y Modelado (Preparación)
-**Contexto:** Auditoría profunda del `backlog.md` para la Iteración 2.1 bajo el rigor de "Abogado del Diablo" y principios MLOps avanzados.
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de las tareas `T-2.1.1.LIN.RED` y `T-2.1.1.LIN.GRN` para garantizar la trazabilidad técnica.
 
 ### ⚖️ Decisiones
-1. **Blindaje TDD Nivel 3 del Backlog:** Se rechazó cualquier validación manual o reporte visual como criterio de éxito (DoD). Se mandató que el 100% de los entregables técnicos y de negocio estén precedidos por una aserción automatizada (RED).
-2. **Automatización de la Salud Estadística:** Se sustituyó el reporte EDA manual por un test de Deriva Distribucional (`DRIFT.RED`) integrado en el pipeline, garantizando que la calidad del dato sea una constante técnica y no un juicio subjetivo.
-3. **TDD Verdadero en Infraestructura y Docker:** Se invirtió el orden de construcción de contenedores. Ahora es obligatorio escribir el test de salud del servicio (`SMK.RED`) antes de construir la imagen Docker (`DOCK.GRN`), evitando "falsos positivos" de despliegue donde el contenedor corre pero el servicio falla.
-4. **Separación de Performance y Observabilidad:** Se dividió el refactor de la API en dos tareas atómicas: Optimización de Latencia (`PERF`) y Formato de Logs JSON (`OBS`). Esto asegura que el cumplimiento de los SLAs de velocidad no oculte fallos en la trazabilidad del sistema.
-5. **Desacople de Gobernanza de Datos:** Se separó la Ingesta física (`A.GRN`) del Registro de Linaje (`LIN.GRN`). Esto garantiza que fallos en la capa de metadatos no bloqueen el flujo de carga de datos, manteniendo la trazabilidad atómica y aislada.
-6. **Certificación E2E sin Intervención Humana:** Se eliminó el "UAT visual" como hito técnico. El cierre de la UI ahora depende exclusivamente de una suite E2E (Selenium/Playwright) al 100% en verde, alineándose con el mandato global de **BDD-as-DoD**.
+1. **Persistencia de Metadatos vía `df.attrs`:** Se decidió utilizar el diccionario `attrs` de Pandas para almacenar el linaje técnico (`hash` y `timestamp`). Esto cumple con la regla de oro **"Bronze is Sacred"**, ya que permite adjuntar metadatos de gobernanza al objeto de datos sin alterar el esquema (columnas) original del CSV.
+2. **Hashing de Archivo SHA-256:** Se implementó el cálculo del hash SHA-256 sobre el archivo físico en el momento de la ingesta. Esta es la "huella dactilar" digital que garantiza que los datos procesados corresponden exactamente al archivo fuente en el disco, permitiendo auditorías de integridad futuras.
+3. **Timestamp de Ingesta en ISO 8601:** Se estandarizó el registro del tiempo de ingesta en formato string ISO 8601, facilitando la interoperabilidad con sistemas externos y garantizando la trazabilidad temporal del linaje.
 
 ### 💡 Lecciones Aprendidas (Learnings)
-- **El UAT manual es Deuda Técnica:** Confiar en la verificación ocular al final de una iteración es un riesgo inaceptable en sistemas de IA. La suite de pruebas E2E debe ser el único juez de la integridad de la experiencia de usuario.
-- **La Infraestructura también es Código:** Los servicios de soporte (MLflow, DBs) deben ser validados mediante tests de conectividad automáticos (`RED`) antes de iniciar procesos costosos como el entrenamiento, eliminando tiempos muertos de depuración.
-- **Atomicidad = Diagnóstico Veloz:** Al separar el linaje de la ingesta, un error en la base de datos de metadatos no detiene el pipeline de datos, permitiendo una recuperación parcial y un aislamiento claro de la falla.
+- **Metadatos no intrusivos:** `df.attrs` es la herramienta ideal para la gobernanza en capas tempranas; evita la tentación de añadir columnas "técnicas" que complican la lógica de limpieza posterior y mantienen el contrato de datos limpio.
+- **TDD para Gobernanza:** Escribir el test de linaje antes que la implementación (`LIN.RED`) obligó a definir exactamente qué campos de metadatos eran necesarios, evitando el exceso de información (over-engineering) en la capa Bronze.
 
 ---
 
-## [2026-04-26] - Blindaje de Contrato de Datos (v1.8.0) y Resiliencia MLOps
+## [2026-04-26] - Implementación de Limpieza Silver y Calidad de Código (Slice 1)
 
-**Fase Actual:** Fase 1: Discovery
-**Contexto:** Auditoría extrema ("Devil's Advocate") y certificación final del `contract.md` y sincronización con `SpecDD.md` por el @ai-solutions-architect.
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de `T-2.1.1.B.RED`, `T-2.1.1.B.GRN` y `T-2.1.1.REF`.
 
 ### ⚖️ Decisiones
-1. **Blindaje de Unidades y Tipado en Disco (Parquet):** Se prohibió el uso de formatos planos (CSV/JSON) para las capas Silver y Gold. Se mandató el uso de **Parquet (Snappy)** para garantizar que el tipado estricto (`float64`, `SpeciesEnum`) y las unidades de medida (cm) se preserven físicamente en disco sin degradación.
-2. **Implementación del "Virginica Shield" y Lógica de Inferencia:** Se formalizaron las reglas matemáticas para el campo `needs_review`. Se estableció una política asimétrica donde la clase `Virginica` requiere un **98% de confianza** para ser automatizada, elevando la seguridad operativa sobre la especie de mayor riesgo.
-3. **Política de Frontera Estricta (Extra.forbid):** Se decidió rechazar cualquier petición API con campos adicionales o coerción de tipos (HTTP 422 - `ERR_07`). Esto cierra vectores de ataque por inyección de payload y garantiza que el sistema solo procese datos contractualmente válidos.
-4. **Arquitectura Closed-Loop (Filtrado de Ruido):** Se integró el campo `is_valid_sample` en el Feedback Loop. Esto permite que el experto humano marque datos corruptos o ruidosos para que sean **ELIMINADOS** de la capa Gold, evitando el envenenamiento del dataset de reentrenamiento.
-5. **Hashing Lógico Determinista para Linaje:** Se rechazó el hashing de archivos físicos por su volatilidad. Se mandató que el `data_version_hash` se calcule sobre el **contenido lógico de los datos**, garantizando que el linaje sea inmutable y reproducible independientemente de la infraestructura.
-6. **Securización contra DoS y Inyección:** Se establecieron límites estrictos de longitud para `analyst_id` (50 caracteres) y validación de formato **UUIDv4** para `prediction_id`, blindando el repositorio de auditoría contra ataques de saturación de memoria.
-7. **Soberanía del Tiempo (UTC-Only):** Se prohibió el uso de husos horarios locales. Todo evento de sistema debe grabarse en **UTC estricto**, eliminando discrepancias temporales en el análisis de derivas (Drift) entre servidores distribuidos.
+1. **Jerarquía de Excepciones de Dominio:** Se implementó una clase base `AppError` y excepciones específicas (`RangeValidationError`, `NullInputError`) con códigos de error estandarizados (`ERR_01`, `ERR_04`). Esto permite una gestión de errores predecible tanto en el pipeline de datos como en la futura API.
+2. **Normalización Agresiva de Categorías:** Se decidió limpiar la columna `species` eliminando el prefijo `"Iris-"` y aplicando capitalización. Esto asegura la paridad total con el `SpeciesEnum` definido en el SpecDD, eliminando inconsistencias de nombres desde la capa Silver.
+3. **Refuerzo del Leakage Shield:** La eliminación de la columna `Id` se movió al `DataProcessor` para asegurar que ningún registro procesado para entrenamiento o inferencia contenga identificadores que puedan causar sobreajuste o fuga de información.
+4. **Tipado Estático Obligatorio en Datos:** Se integró `mypy` y `pandas-stubs` al flujo de trabajo. A pesar de la naturaleza dinámica de Pandas, el uso de stubs de tipos eleva la robustez de la capa de transformación y previene errores de "AttributeError" en tiempo de ejecución.
 
 ### 💡 Lecciones Aprendidas (Learnings)
-- **El CSV es el enemigo de la Calidad:** Confiar en archivos de texto para capas intermedias de datos destruye el tipado estricto definido en el código. El contrato de datos debe ser también un **Contrato de Almacenamiento**.
-- **La API es una Frontera de Seguridad:** No basta con validar rangos biológicos; si la API es permisiva con campos extra, el sistema es vulnerable. El rigor del contrato de datos debe extenderse a la configuración del parser (Pydantic `Extra.forbid`).
-- **El Linaje Físico es Engañoso:** Un mismo dataset guardado dos veces en Parquet puede tener hashes de archivo distintos. El linaje real reside en el dato, no en el contenedor.
-- **El Ruido es Veneno:** Sin una flag de "Muestra Inválida" (`is_valid_sample`), el ciclo de feedback obliga al experto a categorizar basura como conocimiento, degradando el modelo con cada iteración de reentrenamiento.
+- **Stubs de Pandas:** La instalación de `pandas-stubs` es crítica; sin ellos, `mypy` no puede validar las operaciones de DataFrame, dejando la capa de datos vulnerable a errores de tipado silenciosos.
+- **Códigos de Error en el Contrato:** Vincular las excepciones directamente a los códigos `ERR_XX` del `contract.md` facilita la trazabilidad entre el fallo técnico y la especificación de negocio.
 
 ---
-... (Rest of history preserved)
+
+## [2026-04-26] - Certificación de Salud Estadística (Slice 1: Silver)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de las tareas `T-2.1.1.DRIFT.RED` y `T-2.1.1.DRIFT.GRN` para la detección de deriva.
+
+### ⚖️ Decisiones
+1. **Detección de Deriva mediante Z-score:** Se implementó la lógica de Z-score (Desviación absoluta respecto a la media / Desviación estándar) para detectar cambios significativos en la distribución del batch. El umbral se fijó en `Z > 3` (3 sigmas), siguiendo el **Contrato de Datos**.
+2. **Alertas No Bloqueantes (`Warning`):** Se decidió implementar `StatisticalDriftWarning` como una subclase de `Warning` en lugar de una excepción bloqueante. Esto cumple con el contrato donde la deriva genera alertas de telemetría (`ERR_06`) pero permite que el pipeline continúe la inferencia si los datos son biológicamente válidos.
+3. **Inyección de Baseline Stats:** El método `check_drift` recibe un diccionario de estadísticas base. Esto permite que la validación sea dinámica y pueda ser alimentada desde el dataset de entrenamiento original o un repositorio de metadatos.
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **Separación de Rangos y Distribución:** La validación biológica (`RangeValidationError`) es una regla de negocio (Hard Reject), mientras que la deriva estadística es una regla de salud del modelo (Soft Alert). Mantener esta separación es clave para la disponibilidad del sistema.
+
+---
+
+## [2026-04-26] - Validación de Contrato Rígido con Pydantic (Slice 1: Silver)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de `T-2.1.1.VAL.RED` y `T-2.1.1.VAL.GRN`.
+
+### ⚖️ Decisiones
+1. **Adopción de Pydantic v2 para Validación de Runtime:** Se seleccionó Pydantic como motor de validación por su alta performance y soporte para tipado estricto. Se configuró `ConfigDict(extra='forbid', strict=True)` para cumplir con la política de "No Extra Fields" y "No Coercion" del Contrato de Datos.
+2. **Validación Lógica Cruzada (`@model_validator`):** Se implementaron validaciones biológicas complejas (ej: ancho < largo) que no son posibles con tipos simples. Esto asegura que el sistema rechace datos morfológicamente imposibles antes de que lleguen al modelo.
+3. **Mapeo de ValidationError a Dominio:** Se decidió capturar el `ValidationError` de Pydantic y re-lanzar excepciones personalizadas (`RangeValidationError`, `SchemaValidationError`). Esto mantiene la interfaz de errores limpia y alineada con los códigos `ERR_01` a `ERR_07`.
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **Strict Mode de Pydantic:** El flag `strict=True` es fundamental para evitar que Pydantic convierta strings a floats automáticamente, garantizando que el cliente de la API envíe el tipo de dato correcto.
+- **TDD en el Contrato:** Definir el test RED con todas las violaciones posibles (nulos, rangos, lógica, extras, tipos) permitió construir un validador robusto en un solo paso iterativo.

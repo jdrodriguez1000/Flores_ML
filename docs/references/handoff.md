@@ -1,20 +1,25 @@
 # Handoff Operativo - Flores_ML
 
 **Fecha:** 26 de abril de 2026
-**Estado de la Sesión:** Backlog de Fase 2 Certificado y Blindado (Nivel 3)
+**Estado de la Sesión:** Slice 1 (Ingeniería de Datos) Certificado al 100%.
 
 ## ✅ Logros
-1. **Auditoría y Blindaje del Backlog Maestro (Iteración 2.1):** Se elevó el backlog a un estándar purista de TDD y SpecDD (Nivel 3). Se erradicaron todas las validaciones manuales y reportes visuales como criterios de finalización.
-2. **Automatización de la Salud Técnica y de Negocio:** Se integraron tests RED para Umbrales de Accuracy (BRD), Latencia de API (<3s), Observabilidad (Logs JSON estructurados) y Deriva Distribucional (Data Drift).
-3. **Mecanización de la Infraestructura y Docker:** Se estableció el patrón de "Test-First" para contenedores (Smoke Test RED antes de Docker Build) y conectividad de MLOps (MLflow ping RED).
-4. **Segmentación Atómica de la UI:** Se dividió la implementación del Dashboard en ciclos independientes para el flujo de predicción y el bucle de feedback, garantizando la trazabilidad de errores en la interfaz.
+1. **Certificación de Limpieza Silver (T-2.1.1.B.GRN):** Implementación de `DataProcessor` con **Leakage Shield** y normalización.
+2. **Detección de Deriva (T-2.1.1.DRIFT.GRN):** Lógica de Z-score integrada y validada con tests.
+3. **Validación de Contrato Rígido (T-2.1.1.VAL.GRN):**
+   - Integración de **Pydantic** para validación de entrada en tiempo de ejecución.
+   - Implementación de reglas de **Biological Range** (0.1-15.0 cm) y **Logic Consistency** (width < length).
+   - Política estricta de "No Extra Fields" y "No Coercion" (Strict Typing).
+   - Suite de pruebas `tests/test_data_contract.py` en `GREEN`.
+4. **Higiene Técnica:** Excepciones de dominio (`ERR_01` a `ERR_07`) vinculadas al Contrato de Datos.
 
 ## ⏳ Pendientes
-- **T-2.1.1.A.RED:** Inicio de la Bala Trazadora (Slice 1: Test de Ingesta Técnica para zona Bronze).
+- **T-2.1.2.MLO.RED:** Test de Conexión a Servidor Tracking (MLflow/W&B).
+- **T-2.1.2.RED:** Test de Interfaz de Predicción.
 
 ## 🚫 Bloqueadores
-- Ninguno. La metodología de ejecución está sellada y los contratos de validación automatizada están listos.
+- Ninguno. El Slice 1 está cerrado y certificado.
 
 ## 🚀 Próximos Pasos
-1. Iniciar la ejecución de la **Fase 2: Ingeniería y Modelado**.
-2. Asignar la tarea **T-2.1.1.A.RED** al `@ai-data-qa-engineer` para establecer la línea base de ingesta.
+1. **Inicio de Slice 2 (Modelado):** Configurar el entorno de tracking de experimentos y definir la interfaz de predicción según el SpecDD.
+2. **Entrenamiento de Baseline:** Una vez configurado el tracking, proceder con el entrenamiento del modelo base.
