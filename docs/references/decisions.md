@@ -97,3 +97,38 @@
 ### 💡 Lecciones Aprendidas (Learnings)
 - **FastAPI Exception Overriding:** Sobrescribir el `RequestValidationError` de FastAPI es la técnica más limpia para inyectar códigos de error de negocio en las validaciones de esquema automáticas.
 - **Integración Temprana:** Agrupar el Slice 3 como una unidad funcional (API + DB + Shielding) permitió descubrir inconsistencias entre el SpecDD y la implementación real de los servicios antes de llegar a la fase de UI.
+
+---
+
+## [2026-04-28] - Implementación de Interfaz Clínica Predictiva (Slice 4: UI)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de las tareas `T-2.1.4.UI.RED` y `T-2.1.4.UI.GRN`. Implementación del Dashboard y validación E2E.
+
+### ⚖️ Decisiones
+1. **Playwright para Automatización E2E:** Se seleccionó Playwright sobre Selenium por su velocidad de ejecución y capacidad superior de "Auto-waiting", crítica para aplicaciones dinámicas como Streamlit. Se implementaron localizadores resilientes basados en clases CSS (`.stNumberInput`) para evitar roturas por cambios en atributos de accesibilidad.
+2. **Adopción del Design System "The Clinical Sanctuary":** Se mapearon rigurosamente los tokens de color y tipografía de `DESIGN.md` al archivo `.streamlit/config.toml`. Se utilizó inyección de CSS custom para respetar la "Regla de No-Líneas" y la jerarquía de superficies.
+3. **Integración Monolítica (Direct Invocations):** Siguiendo el SAD, el Dashboard consume la lógica de negocio importando directamente el `PredictionService`. Esto garantiza una latencia de 0ms en la comunicación UI-Core y simplifica el despliegue del Tracer Bullet sin sacrificar la capacidad de desacoplamiento futuro vía API.
+4. **Rotación Dinámica de Puertos en TDD:** Debido a los bloqueos de puerto por el estado `TIME_WAIT` del sistema operativo durante las iteraciones rápidas de prueba, se decidió rotar los puertos de ejecución (8501 -> 8504).
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **Drift de Dependencias (Pydantic V2):** Se identificó que `pydantic-settings` debe declararse explícitamente en el entorno, ya que no se incluye por defecto en el paquete base de Pydantic v2. Su ausencia causa fallos silenciosos en la carga de la UI.
+- **Gestión de Caché en Streamlit:** El uso de `@st.cache_resource` es potente pero peligroso durante el refactor de firmas de métodos. Es imperativo reiniciar el proceso de Streamlit para limpiar la memoria cuando se modifican los constructores de los servicios Core.
+- **Validación Visual de Shadow Mode:** Se confirmó que el Dashboard debe ser capaz de reaccionar dinámicamente a la variable `SHADOW_MODE`, ocultando o forzando la visualización de la IA según el estado del sistema, lo cual es vital para la certificación humana.
+
+---
+
+## [2026-04-28] - Implementación de Feedback Loop Manual (Slice 4: UI)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de `T-2.1.4.FDB.GRN`. Integración de la capacidad de corrección manual del analista.
+
+### ⚖️ Decisiones
+1. **Persistencia vía `st.session_state`:** Se decidió utilizar el estado de sesión de Streamlit para almacenar el último objeto `PredictionOutput`. Esto es crítico para el Feedback Loop, ya que las interacciones con componentes (como el selector de especies o botones) disparan un re-run del script que borraría las variables locales, perdiendo el `prediction_id` necesario para la auditoría.
+2. **Desambiguación de Localizadores E2E (.first):** Ante fallos de "strict mode violation" en Playwright, se decidió aplicar `.first` en los localizadores de texto de especies. La coexistencia del resultado de la IA y el selector de feedback (radio buttons) genera múltiples elementos con el mismo texto, por lo que la especificación de orden o contenedor es obligatoria.
+3. **Hardcoding de Identidad en Tracer Bullet:** Para la persistencia del feedback, se fijó el `analyst_id` como "ANALYST-01". Se decidió posponer la implementación de un sistema de autenticación real para iteraciones posteriores, priorizando el flujo de datos sobre la seguridad de acceso en esta fase.
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **Reruns de Streamlit:** Entender el ciclo de vida de Streamlit es vital para la ingeniería de interfaces de IA. Sin `session_state`, el Feedback Loop es imposible de implementar de forma nativa.
+- **Fragilidad de Selectores de Texto:** En frameworks que generan UI dinámica como Streamlit, los selectores basados en texto son potentes pero frágiles ante la duplicidad de información (IA vs. Humano). La arquitectura de tests debe prever estas colisiones visuales.
+

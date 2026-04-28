@@ -87,10 +87,10 @@ Toda iteración en este proyecto sigue un ciclo de vida estricto gobernado por e
 #### [Slice 4: UI & Feedback - La Experiencia de Usuario]
 | ID                  | Tarea                           | Responsable           | Estado        | Dependencias     | DoD (BDD Target)                                                                    |
 | :------------------ | :------------------------------ | :-------------------- | :------------ | :--------------- | :---------------------------------------------------------------------------------- |
-| **T-2.1.4.UI.RED**  | Test E2E Interfaz de Predicción | @ai-full-stack-sdet   | 🔴 No iniciada | T-2.1.3.DOCK.GRN | Escenario `Usuario ingresa variables y ve predicción` (Selenium/Playwright) es RED. |
-| **T-2.1.4.UI.GRN**  | Implementación UI Predicción    | @ai-frontend-engineer | 🔴 No iniciada | T-2.1.4.UI.RED   | Escenario `Usuario ingresa variables y ve predicción` es GREEN.                     |
-| **T-2.1.4.FDB.RED** | Test E2E de Feedback Loop       | @ai-full-stack-sdet   | 🔴 No iniciada | T-2.1.4.UI.GRN   | Escenario `Registro de corrección manual` (Selenium/Playwright) es RED.             |
-| **T-2.1.4.FDB.GRN** | Implementación Feedback Loop UI | @ai-frontend-engineer | 🔴 No iniciada | T-2.1.4.FDB.RED  | Escenario `Registro de corrección manual` es GREEN.                                 |
+| **T-2.1.4.UI.RED**  | Test E2E Interfaz de Predicción | @ai-full-stack-sdet   | 🟢 Completada | T-2.1.3.DOCK.GRN | Escenario `Usuario ingresa variables y ve predicción` (Selenium/Playwright) es RED. |
+| **T-2.1.4.UI.GRN**  | Implementación UI Predicción    | @ai-frontend-engineer | 🟢 Completada | T-2.1.4.UI.RED   | Escenario `Usuario ingresa variables y ve predicción` es GREEN.                     |
+| **T-2.1.4.FDB.RED** | Test E2E de Feedback Loop       | @ai-full-stack-sdet   | 🟢 Completada | T-2.1.4.UI.GRN   | Escenario `Registro de corrección manual` (Selenium/Playwright) es RED.             |
+| **T-2.1.4.FDB.GRN** | Implementación Feedback Loop UI | @ai-frontend-engineer | 🟢 Completada | T-2.1.4.FDB.RED  | Escenario `Registro de corrección manual` es GREEN.                                 |
 | **T-2.1.4.REF**     | Refactor y Estilizado de UI     | @ai-frontend-engineer | 🔴 No iniciada | T-2.1.4.FDB.GRN  | UI modularizada respeta lineamientos del Mockup y pasa linting/formatting.          |
 | **T-2.1.4.VAL**     | Certificación Final E2E Suite   | @ai-full-stack-sdet   | 🔴 No iniciada | T-2.1.4.REF      | Ejecución global de la suite E2E completa arroja 100% de tests aprobados (GREEN).   |
 
