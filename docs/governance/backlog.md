@@ -91,14 +91,14 @@ Toda iteración en este proyecto sigue un ciclo de vida estricto gobernado por e
 | **T-2.1.4.UI.GRN**  | Implementación UI Predicción    | @ai-frontend-engineer | 🟢 Completada | T-2.1.4.UI.RED   | Escenario `Usuario ingresa variables y ve predicción` es GREEN.                     |
 | **T-2.1.4.FDB.RED** | Test E2E de Feedback Loop       | @ai-full-stack-sdet   | 🟢 Completada | T-2.1.4.UI.GRN   | Escenario `Registro de corrección manual` (Selenium/Playwright) es RED.             |
 | **T-2.1.4.FDB.GRN** | Implementación Feedback Loop UI | @ai-frontend-engineer | 🟢 Completada | T-2.1.4.FDB.RED  | Escenario `Registro de corrección manual` es GREEN.                                 |
-| **T-2.1.4.REF**     | Refactor y Estilizado de UI     | @ai-frontend-engineer | 🔴 No iniciada | T-2.1.4.FDB.GRN  | UI modularizada respeta lineamientos del Mockup y pasa linting/formatting.          |
-| **T-2.1.4.VAL**     | Certificación Final E2E Suite   | @ai-full-stack-sdet   | 🔴 No iniciada | T-2.1.4.REF      | Ejecución global de la suite E2E completa arroja 100% de tests aprobados (GREEN).   |
+| **T-2.1.4.REF**     | Refactor y Estilizado de UI     | @ai-frontend-engineer | 🟢 Completada | T-2.1.4.FDB.GRN  | UI modularizada respeta lineamientos del Mockup y pasa linting/formatting.          |
+| **T-2.1.4.VAL**     | Certificación Final E2E Suite   | @ai-full-stack-sdet   | 🟢 Completada | T-2.1.4.REF      | Ejecución global de la suite E2E completa arroja 100% de tests aprobados (GREEN).   |
 
 #### [Slice 5: Cierre y Gobernanza]
 | ID              | Tarea                                | Responsable             | Estado        | Dependencias | DoD                                                                        |
 | :-------------- | :----------------------------------- | :---------------------- | :------------ | :----------- | :------------------------------------------------------------------------- |
-| **T-2.1.5.SES** | Ritual de Cierre y Log de Decisiones | @ai-session-steward     | 🔴 No iniciada | T-2.1.4.VAL  | `handoff.md` y `decisions.md` actualizados con el resumen de la iteración. |
-| **T-2.1.5.GOV** | Auditoría de Higiene del Repo        | @ai-repository-governor | 🔴 No iniciada | T-2.1.5.SES  | `.gitignore` validado, notebooks limpios y commits semánticos.             |
+| **T-2.1.5.SES** | Ritual de Cierre y Log de Decisiones | @ai-session-steward     | 🟢 Completada | T-2.1.4.VAL  | `handoff.md` y `decisions.md` actualizados con el resumen de la iteración. |
+| **T-2.1.5.GOV** | Auditoría de Higiene del Repo        | @ai-repository-governor | 🟢 Completada | T-2.1.5.SES  | `.gitignore` validado, notebooks limpios y commits semánticos.             |
 | **T-2.1.5.SYN** | Sincronización de Knowledge Base     | @ai-session-steward     | 🔴 No iniciada | T-2.1.5.GOV  | NotebookLM sincronizado con el estado final de la iteración.               |
 
 #### [Diagrama de Ejecución - Iteración 2.1]
