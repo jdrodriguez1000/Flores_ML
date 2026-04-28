@@ -1,7 +1,7 @@
 # Handoff Operativo - Flores_ML
 
-**Fecha:** 27 de abril de 2026
-**Estado de la Sesión:** Slice 2 (Modelado & MLOps) Finalizado. Baseline Certificado.
+**Fecha:** 28 de abril de 2026
+**Estado de la Sesión:** Slice 2 (Modelado & MLOps) Finalizado. Modelo Certificado en Ética y Rendimiento.
 
 ## ✅ Logros
 1. **Contratos de Interfaz (T-2.1.2.RED):**
@@ -19,7 +19,11 @@
    - **Virginica Shield:** Bloqueo de auto-aprobación para Virginica con confianza < 98%.
    - **Audit Randomizer:** Trigger de auditoría aleatoria del 5% integrado.
    - Refactor PEP8/Ruff 100% aprobado.
-5. **Configuración Centralizada:**
+5. **Validación de Ética y Sesgo (T-2.1.2.BIAS.RED/GRN):**
+   - Implementación de `tests/test_bias_leakage.py` para detección de Target Leakage y Disparate Impact.
+   - Certificación de Equidad (Fairness) cumpliendo la Regla del 80% (Impact Ratio: 0.952).
+   - Generación de `reports/bias_validation_report.md` con el dictamen de auditoría.
+6. **Configuración Centralizada:**
    - Implementación de `src/core/config.py` para gestión de umbrales y estados (Shadow Mode).
 
 ## ⏳ Pendientes

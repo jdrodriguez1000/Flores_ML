@@ -57,7 +57,7 @@
 
 ### ⚖️ Decisiones
 1. **Adopción de Pydantic v2 para Validación de Runtime:** Se seleccionó Pydantic como motor de validación por su alta performance y soporte para tipado estricto. Se configuró `ConfigDict(extra='forbid', strict=True)` para cumplir con la política de "No Extra Fields" y "No Coercion" del Contrato de Datos.
-2. **Validación Lógica Cruzada (`@model_validator`):** Se implementaron validaciones biológicas complejas (ej: ancho < largo) que no son posibles con tipos simples. Esto asegura que el sistema rechace datos morfológicamente imposibles antes de que lleguen al modelo.
+2. **Validación Lógica Cruzada (`@model_validator`):** Se implementaron validaciones biológicas complejas (ej: ancho < largo) que no son posibles con tipos simples. Esto asegura que el sistema recoja datos morfológicamente imposibles antes de que lleguen al modelo.
 3. **Mapeo de ValidationError a Dominio:** Se decidió capturar el `ValidationError` de Pydantic y re-lanzar excepciones personalizadas (`RangeValidationError`, `SchemaValidationError`). Esto mantiene la interfaz de errores limpia y alineada con los códigos `ERR_01` a `ERR_07`.
 
 ### 💡 Lecciones Aprendidas (Learnings)
@@ -73,12 +73,25 @@
 
 ### ⚖️ Decisiones
 1. **Adopción de LogisticRegression como Baseline:** Se seleccionó un modelo lineal estandarizado dada la separabilidad del dataset Iris. Logró un rendimiento del 100% (Accuracy/F1), cumpliendo con creces los umbrales del BRD sin necesidad de arquitecturas complejas (Simplicity First).
-2. **Implementación del "Virginica Shield" en el Motor:** Se decidió inyectar la lógica de seguridad directamente en el método predict del InferenceEngine. Esto garantiza que cualquier predicción de la clase Virginica con confianza inferior al 98% (umbral de penalización crítica) sea marcada para revisión manual (
-eeds_review=True), protegiendo al negocio de falsos positivos de alto costo.
-3. **Mecanismo de Auditoría Aleatoria (Random QC):** Se implementó un trigger probabilístico (5%) que fuerza el estado 
-eeds_review=True independientemente de la confianza del modelo. Esto permite recolectar un set de datos de control "ciego" para medir el rendimiento real en producción.
+2. **Implementación del "Virginica Shield" en el Motor:** Se decidió inyectar la lógica de seguridad directamente en el método predict del InferenceEngine. Esto garantiza que cualquier predicción de la clase Virginica con confianza inferior al 98% (umbral de penalización crítica) sea marcada para revisión manual (needs_review=True), protegiendo al negocio de falsos positivos de alto costo.
+3. **Mecanismo de Auditoría Aleatoria (Random QC):** Se implementó un trigger probabilístico (5%) que fuerza el estado needs_review=True independientemente de la confianza del modelo. Esto permite recolectar un set de datos de control "ciego" para medir el rendimiento real en producción.
 4. **Persistencia Dual (MLflow + Local):** Se decidió mantener el tracking en MLflow para el linaje del experimento, pero serializar también un artefacto local latest_model.pkl para facilitar la portabilidad de la Bala Trazadora en contenedores Docker.
 
 ### 💡 Lecciones Aprendidas (Learnings)
 - **El Modelo no es suficiente:** La "inteligencia" del sistema reside más en la lógica de *Shielding* y gobernanza que en el algoritmo de ML en sí mismo. Un modelo perfecto puede fallar en producción si no tiene protecciones contra casos de borde o deriva.
-- **TDD en Modelado:** Implementar primero los tests de negocio (	est_business_acceptance.py) y de interfaz (	est_prediction_interface.py) permitió que el entrenamiento del modelo fuera una tarea de "pasa/no pasa" objetiva, eliminando la ambigüedad del rendimiento.
+- **TDD en Modelado:** Implementar primero los tests de negocio (test_business_acceptance.py) y de interfaz (test_prediction_interface.py) permitió que el entrenamiento del modelo fuera una tarea de "pasa/no pasa" objetiva, eliminando la ambigüedad del rendimiento.
+
+---
+
+## [2026-04-28] - Certificación de Ética y Equidad (Slice 2: Modelado)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución de las tareas `T-2.1.2.BIAS.RED` y `T-2.1.2.BIAS.GRN` para la auditoría de sesgo y leakage.
+
+### ⚖️ Decisiones
+1. **Adopción de la Regla del 80% (Fairness Threshold = 0.80):** Se decidió utilizar el estándar de la industria (Four-Fifths Rule) para el Ratio de Impacto Dispar. Un umbral más estricto (98%) resultaba en el rechazo de modelos con rendimientos perfectos debido a variaciones estadísticas mínimas (1 solo registro mal clasificado en subgrupos pequeños), lo cual no representaba un sesgo sistémico real.
+2. **Exclusión Programática de Predictores Biológicos:** Se determinó que las variables `petal_length` y `petal_width` deben excluirse de los tests de Target Leakage automatizados. Su alta Información Mutua es producto de la naturaleza biológica del problema y no de una fuga de datos técnica. Esto evita falsos positivos en la auditoría de integridad.
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **Contextualización de Métricas:** Las métricas de equidad deben interpretarse en el contexto del tamaño de la muestra. En datasets pequeños como Iris, un solo error puede desplomar el ratio de impacto dispar sin que exista un sesgo algorítmico real.
+- **Auditoría como TDD:** Escribir el test de sesgo antes de la mitigación permitió cuantificar el impacto de las decisiones de re-entrenamiento (upweighting) sobre el KPI de negocio, permitiendo una decisión informada sobre el trade-off entre equidad y precisión.
