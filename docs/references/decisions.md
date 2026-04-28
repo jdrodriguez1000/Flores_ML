@@ -63,3 +63,22 @@
 ### 💡 Lecciones Aprendidas (Learnings)
 - **Strict Mode de Pydantic:** El flag `strict=True` es fundamental para evitar que Pydantic convierta strings a floats automáticamente, garantizando que el cliente de la API envíe el tipo de dato correcto.
 - **TDD en el Contrato:** Definir el test RED con todas las violaciones posibles (nulos, rangos, lógica, extras, tipos) permitió construir un validador robusto en un solo paso iterativo.
+
+---
+
+## [2026-04-27] - Industrialización de la Inteligencia (Slice 2: Modelado)
+
+**Fase Actual:** Fase 2: Ingeniería y Modelado
+**Contexto:** Ejecución del Slice 2 completo de la Bala Trazadora, desde la definición de esquemas hasta la industrialización del motor de inferencia.
+
+### ⚖️ Decisiones
+1. **Adopción de LogisticRegression como Baseline:** Se seleccionó un modelo lineal estandarizado dada la separabilidad del dataset Iris. Logró un rendimiento del 100% (Accuracy/F1), cumpliendo con creces los umbrales del BRD sin necesidad de arquitecturas complejas (Simplicity First).
+2. **Implementación del "Virginica Shield" en el Motor:** Se decidió inyectar la lógica de seguridad directamente en el método predict del InferenceEngine. Esto garantiza que cualquier predicción de la clase Virginica con confianza inferior al 98% (umbral de penalización crítica) sea marcada para revisión manual (
+eeds_review=True), protegiendo al negocio de falsos positivos de alto costo.
+3. **Mecanismo de Auditoría Aleatoria (Random QC):** Se implementó un trigger probabilístico (5%) que fuerza el estado 
+eeds_review=True independientemente de la confianza del modelo. Esto permite recolectar un set de datos de control "ciego" para medir el rendimiento real en producción.
+4. **Persistencia Dual (MLflow + Local):** Se decidió mantener el tracking en MLflow para el linaje del experimento, pero serializar también un artefacto local latest_model.pkl para facilitar la portabilidad de la Bala Trazadora en contenedores Docker.
+
+### 💡 Lecciones Aprendidas (Learnings)
+- **El Modelo no es suficiente:** La "inteligencia" del sistema reside más en la lógica de *Shielding* y gobernanza que en el algoritmo de ML en sí mismo. Un modelo perfecto puede fallar en producción si no tiene protecciones contra casos de borde o deriva.
+- **TDD en Modelado:** Implementar primero los tests de negocio (	est_business_acceptance.py) y de interfaz (	est_prediction_interface.py) permitió que el entrenamiento del modelo fuera una tarea de "pasa/no pasa" objetiva, eliminando la ambigüedad del rendimiento.

@@ -19,9 +19,9 @@ Este documento define la identidad, el estado actual y las fuentes de verdad ofi
 
 | Campo | Valor |
 | :--- | :--- |
-| **Fase Actual** | Fase 1: Descubrimiento y Entendimiento del Negocio |
-| **Hito Activo** | T-1.2 Configuración del Proyecto (Config) |
-| **Progreso Estimado** | 15% (Fase 1) |
+| **Fase Actual** | Fase 2: IngenierÃ­a y Modelado (Slices Verticales) |
+| **Hito Activo** | Slice 3: API, Docker & Shielding |
+| **Progreso Estimado** | 45% (Slice 2 Finalizado) |
 
 ---
 

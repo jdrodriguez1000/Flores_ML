@@ -10,7 +10,7 @@ def test_mlflow_tracking_connection_successful():
     os.environ.pop("MLFLOW_HTTP_REQUEST_MAX_RETRIES", None)
     os.environ.pop("MLFLOW_HTTP_REQUEST_TIMEOUT", None)
         
-    mlflow.set_tracking_uri("http://localhost:5001")
+    mlflow.set_tracking_uri("sqlite:///mlruns.db")
     
     # Esto debe funcionar sin lanzar excepciones porque el servidor estará arriba
     experiment = mlflow.set_experiment("dummy_experiment")
