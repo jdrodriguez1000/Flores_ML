@@ -73,8 +73,9 @@ class InferenceEngine:
         try:
             self._model = joblib.load(new_path)
             return True
-        except Exception:
+        except Exception as e:
             # En producción esto registraría el error en logs
+            print(f"DEBUG: Error loading model from {new_path}: {e}")
             self._model = None
             return False
 

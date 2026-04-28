@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SHADOW_MODE=True
+      - MODEL_PATH=models/latest_model.pkl
+      - DB_PATH=data/audit.db
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    restart: always

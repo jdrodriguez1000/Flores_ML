@@ -83,15 +83,17 @@
 
 ---
 
-## [2026-04-28] - Certificación de Ética y Equidad (Slice 2: Modelado)
+## [2026-04-28] - Arquitectura de API y Corazón Operativo (Slice 3: API & Docker)
 
 **Fase Actual:** Fase 2: Ingeniería y Modelado
-**Contexto:** Ejecución de las tareas `T-2.1.2.BIAS.RED` y `T-2.1.2.BIAS.GRN` para la auditoría de sesgo y leakage.
+**Contexto:** Implementación de la API de la Bala Trazadora, gestión de errores, observabilidad y dockerización.
 
 ### ⚖️ Decisiones
-1. **Adopción de la Regla del 80% (Fairness Threshold = 0.80):** Se decidió utilizar el estándar de la industria (Four-Fifths Rule) para el Ratio de Impacto Dispar. Un umbral más estricto (98%) resultaba en el rechazo de modelos con rendimientos perfectos debido a variaciones estadísticas mínimas (1 solo registro mal clasificado en subgrupos pequeños), lo cual no representaba un sesgo sistémico real.
-2. **Exclusión Programática de Predictores Biológicos:** Se determinó que las variables `petal_length` y `petal_width` deben excluirse de los tests de Target Leakage automatizados. Su alta Información Mutua es producto de la naturaleza biológica del problema y no de una fuga de datos técnica. Esto evita falsos positivos en la auditoría de integridad.
+1. **Middleware de Observabilidad JSON:** Se decidió implementar un middleware en FastAPI para capturar metadatos de cada petición (método, ruta, status, duración) y emitirlos en formato JSON a `stdout`. Esto facilita la integración con sistemas de logs modernos y garantiza la visibilidad del rendimiento en tiempo real.
+2. **Mapeo Unificado de Errores (Error Mapping):** Se implementaron manejadores de excepciones personalizados para interceptar errores de Pydantic y re-lanzar códigos estandarizados (`ERR_01`, `ERR_04`, `ERR_07`). Esto asegura que el cliente (Dashboard) reciba respuestas predecibles incluso ante fallos de validación automática.
+3. **Persistencia en SQLite con Modo WAL:** Se seleccionó SQLite para el almacenamiento de auditoría por su simplicidad en el despliegue del Tracer Bullet. El modo **Write-Ahead Logging (WAL)** es obligatorio para permitir la concurrencia necesaria durante el registro de feedback sin bloquear las lecturas de inferencia.
+4. **Estrategia de Docker Multi-stage:** Se implementó un Dockerfile de dos etapas (builder y runner). Esto permite reducir el tamaño de la imagen final y mejorar la seguridad al no incluir herramientas de compilación en el entorno de ejecución productivo.
 
 ### 💡 Lecciones Aprendidas (Learnings)
-- **Contextualización de Métricas:** Las métricas de equidad deben interpretarse en el contexto del tamaño de la muestra. En datasets pequeños como Iris, un solo error puede desplomar el ratio de impacto dispar sin que exista un sesgo algorítmico real.
-- **Auditoría como TDD:** Escribir el test de sesgo antes de la mitigación permitió cuantificar el impacto de las decisiones de re-entrenamiento (upweighting) sobre el KPI de negocio, permitiendo una decisión informada sobre el trade-off entre equidad y precisión.
+- **FastAPI Exception Overriding:** Sobrescribir el `RequestValidationError` de FastAPI es la técnica más limpia para inyectar códigos de error de negocio en las validaciones de esquema automáticas.
+- **Integración Temprana:** Agrupar el Slice 3 como una unidad funcional (API + DB + Shielding) permitió descubrir inconsistencias entre el SpecDD y la implementación real de los servicios antes de llegar a la fase de UI.
